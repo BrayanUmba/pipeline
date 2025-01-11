@@ -66,6 +66,12 @@ jobs:
           cd ..
           rm -rf cri-dockerd
 
+      - name: Enable and start cri-dockerd
+        run: |
+          sudo systemctl enable cri-docker.socket
+          sudo systemctl start cri-docker.socket
+          sudo systemctl status cri-docker.socket
+
       - name: Install Minikube
         run: |
           curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
