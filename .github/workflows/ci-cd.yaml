@@ -46,6 +46,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y apt-transport-https curl conntrack
 
+      # Instalar crictl
+      - name: Install crictl
+        run: |
+          VERSION="v1.31.0"
+          curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+          sudo tar -C /usr/local/bin -xzf crictl-$VERSION-linux-amd64.tar.gz
+          rm crictl-$VERSION-linux-amd64.tar.gz
+
       # Instalar Minikube
       - name: Install Minikube
         run: |
