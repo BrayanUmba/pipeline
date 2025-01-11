@@ -13,21 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Clonar el repositorio
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Configurar Docker
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Construir la imagen Docker
       - name: Build Docker image
         run: |
           docker pull brayanumba/my-app:latest
 
-      # Testear la imagen Docker
-      - name: Run 
+      - name: Run Docker image
         run: |
           docker run -d -p 3000:3000 brayanumba/my-app:latest
 
@@ -36,17 +32,14 @@ jobs:
     needs: build
 
     steps:
-      # Clonar el repositorio
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Instalar dependencias necesarias para Minikube
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y apt-transport-https curl conntrack
+          sudo apt-get install -y apt-transport-https curl conntrack socat
 
-      # Instalar crictl
       - name: Install crictl
         run: |
           VERSION="v1.31.0"
@@ -54,14 +47,23 @@ jobs:
           sudo tar -C /usr/local/bin -xzf crictl-$VERSION-linux-amd64.tar.gz
           rm crictl-$VERSION-linux-amd64.tar.gz
 
-      # Instalar Minikube
+      - name: Install cri-dockerd
+        run: |
+          sudo apt-get install -y golang-go
+          git clone https://github.com/Mirantis/cri-dockerd.git
+          cd cri-dockerd
+          mkdir bin
+          go build -o bin/cri-dockerd
+          sudo install bin/cri-dockerd /usr/local/bin/
+          cd ..
+          rm -rf cri-dockerd
+
       - name: Install Minikube
         run: |
           curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
           sudo install minikube-linux-amd64 /usr/local/bin/minikube
-          minikube start --driver=none
+          minikube start --driver=none --container-runtime=docker
 
-      # Configurar kubectl
       - name: Set up kubectl
         run: |
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -69,27 +71,23 @@ jobs:
           sudo mv kubectl /usr/local/bin/
           kubectl cluster-info
 
-      # Verificar estado de Minikube
       - name: Verify Minikube
         run: |
           minikube status
           kubectl get nodes
 
-      # Instalar ArgoCD CLI
       - name: Install ArgoCD CLI
         run: |
           curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
           chmod +x argocd
           sudo mv argocd /usr/local/bin/
 
-      # Configurar ArgoCD
       - name: Configure ArgoCD
         run: |
           kubectl create namespace argocd || true
           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
           kubectl wait --for=condition=available --timeout=600s deployment/argocd-server -n argocd
 
-      # Desplegar aplicación con kubectl
       - name: Deploy application with kubectl
         run: |
           kubectl apply -f k8s/app.yaml
