@@ -54,6 +54,14 @@ jobs:
           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
           kubectl port-forward svc/argocd-server -n argocd 8080:443 > /dev/null 2>&1 &
 
+      - name: Wait for ArgoCD to be ready
+        run: |
+          sleep 10 # wait for port-forward to be set up
+
+      - name: Output ArgoCD URL
+        run: |
+          echo "ArgoCD is available at: http://localhost:8080"
+
 
       - name: Deploy application with kubectl
         run: |
