@@ -48,7 +48,12 @@ jobs:
           minikube start --driver=docker --force
           minikube status
 
-      
+      - name: Install argocd
+        run: |
+          kubectl create namespace argocd
+          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+          kubectl port-forward svc/argocd-server -n argocd 8080:443 > /dev/null 2>&1 &
+
 
       - name: Deploy application with kubectl
         run: |
