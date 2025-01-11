@@ -48,5 +48,5 @@ jobs:
       # Desplegar usando ArgoCD
       - name: Deploy to Kubernetes using ArgoCD
         run: |
-          kubectl apply -f k8s/pod.yaml
+          kubectl apply -f k8s/app.yaml
           argocd app sync my-app --auth-token ${{ secrets.ARGOCD_AUTH_TOKEN }}
