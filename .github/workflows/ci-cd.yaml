@@ -24,7 +24,7 @@ jobs:
       # Construir la imagen Docker
       - name: Build Docker image
         run: |
-          docker build -t brayanumba/my-app .
+          docker pull brayanumba/my-app:latest
         
       # Testear la imagen Docker (opcional, si tienes tests)
       - name: Run 
