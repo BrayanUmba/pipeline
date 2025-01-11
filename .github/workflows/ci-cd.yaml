@@ -40,6 +40,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y apt-transport-https curl conntrack socat
 
+      - name: Install CNI plugins
+        run: |
+          VERSION="v1.3.0"
+          curl -LO https://github.com/containernetworking/plugins/releases/download/$VERSION/cni-plugins-linux-amd64-$VERSION.tgz
+          sudo mkdir -p /opt/cni/bin
+          sudo tar -C /opt/cni/bin -xzf cni-plugins-linux-amd64-$VERSION.tgz
+          rm cni-plugins-linux-amd64-$VERSION.tgz
+
       - name: Install crictl
         run: |
           VERSION="v1.31.0"
