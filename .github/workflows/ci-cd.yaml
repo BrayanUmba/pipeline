@@ -40,11 +40,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Instalar dependencias necesarias para Minikube
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https curl conntrack
+
       # Instalar Minikube
       - name: Install Minikube
         run: |
-          sudo apt-get update
-          sudo apt-get install -y apt-transport-https curl
           curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
           sudo install minikube-linux-amd64 /usr/local/bin/minikube
           minikube start --driver=none
